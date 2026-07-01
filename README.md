@@ -30,33 +30,42 @@ Every `git push` to `main` triggers the full pipeline automatically via GitHub w
 
 ## Architecture
 
-```
-Developer
-    │
-    │  git push
-    ▼
-GitHub (<your-github-username>/ImmverseAI-Assignment)
-    │
-    │  Webhook → https://jenkins.charchha.com/github-webhook/
-    ▼
-Jenkins EC2  (jenkins.charchha.com)
-    │
-    ├── 1. Checkout
-    ├── 2. Install Dependencies  (npm ci)
-    ├── 3. Run Tests             (Jest + coverage)
-    ├── 4. Build Docker Image    (multi-stage)
-    ├── 5. Tag Image             (:BUILD_NUMBER + :latest)
-    ├── 6. Push to GHCR          (ghcr.io/<your-github-username>/devops-assignment)
-    ├── 7. Deploy on EC2         (SSH → stop → pull → run)
-    ├── 8. Verify Deployment     (curl /health)
-    └── 9. Cleanup               (remove local images)
-              │
-              ▼
-App EC2  (assignment.charchha.com)
-    │
-    ├── Nginx (port 80) → Docker container (port 3000)
-    ▼
-Cloudflare → HTTPS → Users
+```mermaid
+flowchart TD
+    Dev["👨‍💻 Developer"] -->|git push| GH["GitHub\nImmverseAI-Assignment"]
+    GH -->|"Webhook"| JK
+
+    subgraph JK["Jenkins EC2 — jenkins.charchha.com"]
+        J1[① Checkout] --> J2[② Install Dependencies]
+        J2 --> J3[③ Run Tests]
+        J3 --> J4[④ Build Docker Image]
+        J4 --> J5[⑤ Tag Image]
+        J5 --> J6[⑥ Push to GHCR]
+        J6 --> J7[⑦ Deploy via SSH]
+        J7 --> J8[⑧ Verify Deployment]
+        J8 --> J9[⑨ Cleanup]
+    end
+
+    J6 -->|docker push| GHCR["📦 GHCR\nghcr.io / devops-assignment"]
+    GHCR -->|docker pull| APP
+
+    subgraph APP["App EC2 — assignment.charchha.com"]
+        NGX["Nginx :80"] --> DOC["Docker Container :3000"]
+    end
+
+    APP -->|HTTP :80| CF["☁️ Cloudflare\nSSL Termination"]
+    CF -->|HTTPS| Users["🌐 Users"]
+
+    JK -->|"on failure"| RB["⚠️ Auto-Rollback\npull prev BUILD_NUMBER"]
+    RB -->|pull prev tag| GHCR
+
+    subgraph MON["Monitoring Stack — App EC2"]
+        CAD["cAdvisor :8081"] -->|container metrics| PROM["Prometheus :9090"]
+        PROM -->|data source| GF["Grafana :3001"]
+    end
+
+    DOC -->|scrape /metrics| PROM
+    DOC -->|Docker stats| CAD
 ```
 
 ---
