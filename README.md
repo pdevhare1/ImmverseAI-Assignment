@@ -135,6 +135,10 @@ Two EC2 instances are required:
 | EC2 #1 | Jenkins CI/CD server | `jenkins.charchha.com` |
 | EC2 #2 | Application server | `assignment.charchha.com` |
 
+![Jenkins EC2](Images/jenkins-ec2.png)
+
+![Deployment EC2](Images/Deployment-ec2.png)
+
 **Security Group — EC2 #1 (Jenkins):**
 
 | Port | Source | Purpose |
@@ -155,10 +159,6 @@ Two EC2 instances are required:
 | 443 | 0.0.0.0/0 | HTTPS |
 
 ![Security Groups](Images/Security%20groups.png)
-
-![Jenkins EC2](Images/jenkins-ec2.png)
-
-![Deployment EC2](Images/Deployment-ec2.png)
 
 ---
 
