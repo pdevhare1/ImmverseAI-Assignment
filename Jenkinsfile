@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         IMAGE_TAG    = "${BUILD_NUMBER}"
-        IMAGE_FULL   = "${DOCKER_HUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}"
-        IMAGE_LATEST = "${DOCKER_HUB_USERNAME}/${IMAGE_NAME}:latest"
+        IMAGE_FULL   = "ghcr.io/${GHCR_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}"
+        IMAGE_LATEST = "ghcr.io/${GHCR_USERNAME}/${IMAGE_NAME}:latest"
     }
 
     options {
@@ -74,11 +74,11 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'docker-hub-creds',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
+                    credentialsId: 'ghcr-creds',
+                    usernameVariable: 'GHCR_USER',
+                    passwordVariable: 'GHCR_TOKEN'
                 )]) {
-                    sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
+                    sh 'echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin'
                     sh "docker push ${IMAGE_FULL}"
                     sh "docker push ${IMAGE_LATEST}"
                 }
