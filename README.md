@@ -316,7 +316,9 @@ Add the following A records in Cloudflare with the **orange cloud (Proxied) enab
 | A | `jenkins` | `<EC2_1_PUBLIC_IP>` |
 | A | `assignment` | `<EC2_2_PUBLIC_IP>` |
 
-Set **SSL/TLS → Overview → Flexible** (Cloudflare handles HTTPS; EC2s serve HTTP on port 80).
+Set **SSL/TLS → Overview → Full (Strict)** for production-grade end-to-end encryption.
+
+> **Note:** Full (Strict) requires a valid certificate on the origin server. Issue a free **Cloudflare Origin Certificate** via SSL/TLS → Origin Server → Create Certificate, then install it in the Nginx config on each EC2. This ensures traffic is encrypted at every hop: browser → Cloudflare → EC2.
 
 Enable **SSL/TLS → Edge Certificates → Always Use HTTPS**.
 
