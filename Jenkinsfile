@@ -2,14 +2,9 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_USERNAME = 'devharep7'
-        IMAGE_NAME          = 'devops-assignment'
-        IMAGE_TAG           = "${BUILD_NUMBER}"
-        IMAGE_FULL          = "${DOCKER_HUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}"
-        IMAGE_LATEST        = "${DOCKER_HUB_USERNAME}/${IMAGE_NAME}:latest"
-        CONTAINER_NAME      = 'devops-assignment-container'
-        APP_PORT            = '3000'
-        HOST_PORT           = '80'
+        IMAGE_TAG    = "${BUILD_NUMBER}"
+        IMAGE_FULL   = "${DOCKER_HUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}"
+        IMAGE_LATEST = "${DOCKER_HUB_USERNAME}/${IMAGE_NAME}:latest"
     }
 
     options {
