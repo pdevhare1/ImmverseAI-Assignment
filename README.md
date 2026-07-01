@@ -32,40 +32,47 @@ Every `git push` to `main` triggers the full pipeline automatically via GitHub w
 
 ```mermaid
 flowchart TD
-    Dev["👨‍💻 Developer"] -->|git push| GH["GitHub\nImmverseAI-Assignment"]
-    GH -->|"Webhook"| JK
+    Dev["👨‍💻 Developer"] -->|git push| GH["🐙 GitHub\nImmverseAI-Assignment"]
+    GH -->|Webhook| JK
 
-    subgraph JK["Jenkins EC2 — jenkins.charchha.com"]
-        J1[① Checkout] --> J2[② Install Dependencies]
-        J2 --> J3[③ Run Tests]
-        J3 --> J4[④ Build Docker Image]
-        J4 --> J5[⑤ Tag Image]
-        J5 --> J6[⑥ Push to GHCR]
-        J6 --> J7[⑦ Deploy via SSH]
-        J7 --> J8[⑧ Verify Deployment]
-        J8 --> J9[⑨ Cleanup]
+    subgraph JK["🔧 Jenkins EC2 — jenkins.charchha.com"]
+        J1["① Checkout"] --> J2["② Install Dependencies"]
+        J2 --> J3["③ Run Tests"]
+        J3 --> J4["④ Build Docker Image"]
+        J4 --> J5["⑤ Tag Image"]
+        J5 --> J6["⑥ Push to GHCR"]
+        J6 --> J7["⑦ SSH Deploy"]
+        J7 --> J8["⑧ GET /health"]
+        J8 --> J9["⑨ Cleanup"]
     end
 
-    J6 -->|docker push| GHCR["📦 GHCR\nghcr.io / devops-assignment"]
-    GHCR -->|docker pull| APP
+    J6 -->|docker push| GHCR["📦 GHCR\nghcr.io/pdevhare1/devops-assignment"]
 
-    subgraph APP["App EC2 — assignment.charchha.com"]
-        NGX["Nginx :80"] --> DOC["Docker Container :3000"]
+    subgraph APPEC2["🖥️ Application EC2 — assignment.charchha.com"]
+        HOST["EC2 Host"]
+        NGX["🔀 Nginx — Host\n:80 / :443"]
+        subgraph DE["🐳 Docker Engine"]
+            NODEJS["⬡ Node.js App\n:3000"]
+            PROM["📊 Prometheus\n:9090"]
+            GF["📈 Grafana\n:3001"]
+            CAD["🔍 cAdvisor\n:8081"]
+        end
+        HOST --> NGX
+        NGX -->|proxy :3000| NODEJS
+        PROM -->|scrape /metrics| NODEJS
+        CAD -->|container metrics| PROM
+        GF -->|data source| PROM
     end
 
-    APP -->|HTTP :80| CF["☁️ Cloudflare\nSSL Termination"]
-    CF -->|HTTPS| Users["🌐 Users"]
+    GHCR -->|docker pull| HOST
+    J7 -->|SSH| HOST
+    J8 -->|verify| NODEJS
 
-    JK -->|"on failure"| RB["⚠️ Auto-Rollback\npull prev BUILD_NUMBER"]
+    Users["🌐 Internet Users"] -->|HTTPS| CF["☁️ Cloudflare\nSSL Termination"]
+    CF -->|HTTP :80| NGX
+
+    JK -->|on failure| RB["⚠️ Auto-Rollback\nprev BUILD_NUMBER"]
     RB -->|pull prev tag| GHCR
-
-    subgraph MON["Monitoring Stack — App EC2"]
-        CAD["cAdvisor :8081"] -->|container metrics| PROM["Prometheus :9090"]
-        PROM -->|data source| GF["Grafana :3001"]
-    end
-
-    DOC -->|scrape /metrics| PROM
-    DOC -->|Docker stats| CAD
 ```
 
 ---
