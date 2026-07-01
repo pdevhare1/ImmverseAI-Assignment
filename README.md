@@ -446,11 +446,21 @@ Jenkins sends an email automatically on every build result.
 
 ## Monitoring
 
-The monitoring stack runs on the App EC2 alongside the application using Docker Compose. It includes:
+The monitoring stack runs on the Application EC2 using Docker Compose.
 
-- **Prometheus** — scrapes metrics from the app and cAdvisor
-- **Grafana** — visualizes metrics with a pre-built dashboard
+**Components:**
+
+- **Prometheus** — scrapes metrics from the Node.js app and cAdvisor
+- **Grafana** — visualizes metrics with a pre-built dashboard (accessible to authorized users only)
 - **cAdvisor** — collects Docker container-level CPU, memory, and network metrics
+
+**The dashboard visualizes:**
+
+- CPU Usage
+- Memory Usage
+- HTTP Request Rate and Duration
+- Container Metrics
+- Node.js Runtime Metrics (Event Loop Lag, Heap)
 
 ---
 
@@ -532,12 +542,13 @@ docker compose ps
 
 ### Configuring Grafana
 
-Grafana runs on port `3001` and Prometheus is accessible internally within the Docker Compose network at `http://prometheus:9090` — no Nginx proxy is needed for either service.
+Grafana was configured to use Prometheus as its data source over the internal Docker Compose network.
 
-1. Open Grafana at `http://<EC2_2_PUBLIC_IP>:3001` (ensure port 3001 is open in the App EC2 security group)
-2. Login with `admin / admin123`
-3. Go to **Connections → Data Sources → Add new data source → Prometheus**
-4. Set URL to `http://prometheus:9090` → click **Save & Test**
+1. Log in to Grafana
+2. Navigate to **Connections → Data Sources**
+3. Add **Prometheus** as the data source
+4. Set the Prometheus endpoint to the internal Docker Compose service URL
+5. Click **Save & Test**
 
 ---
 
