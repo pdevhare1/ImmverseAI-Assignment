@@ -165,7 +165,7 @@ pipeline {
                             --restart unless-stopped \\
                             -p ${HOST_PORT}:${APP_PORT} \\
                             -e NODE_ENV=production \\
-                            ${DOCKER_HUB_USERNAME}/${IMAGE_NAME}:\${PREV_TAG} || true
+                            ghcr.io/${GHCR_USERNAME}/${IMAGE_NAME}:\${PREV_TAG} || true
                     ' || true
                 """
             }
