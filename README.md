@@ -209,6 +209,8 @@ Open `http://<EC2_1_IP>:8080` and complete the initial setup wizard.
 
 ![Jenkins Initial Setup](Images/jenkins-initial-setup-screen3.png)
 
+![Jenkins EC2](Images/jenkins-ec2.png)
+
 ---
 
 ### Installing Nginx
@@ -301,6 +303,8 @@ Set **SSL/TLS → Overview → Flexible** (Cloudflare handles HTTPS; EC2s serve 
 Enable **SSL/TLS → Edge Certificates → Always Use HTTPS**.
 
 ![Cloudflare DNS](Images/cloudflare-dns.png)
+
+![Deployment EC2](Images/Deployment-ec2.png)
 
 ---
 
@@ -409,8 +413,6 @@ Go to **Manage Jenkins → Plugins → Available** and install:
 On failure: auto-rollback to previous build image + email notification sent.
 
 ![Pipeline Overview](Images/Pipeline%20Overviwe.png)
-
-![Deployment EC2](Images/Deployment-ec2.png)
 
 ### Email Notifications
 
